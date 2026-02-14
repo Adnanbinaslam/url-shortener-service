@@ -232,58 +232,6 @@ document.getElementById("urlInput").addEventListener("keypress", function(e) {
         shortenUrl();
     }
 });
-
-
-// const BASE_URL = window.location.origin;
-// const API_CREATE = BASE_URL + "/shorty/create";
-// const REDIRECT_BASE = BASE_URL + "/shorty/r/";
-
-// async function shortenUrl() {
-//     let url = document.getElementById("urlInput").value.trim();
-
-//     if (!url) {
-//         alert("Enter URL");
-//         return;
-//     }
-
-//     if (!url.startsWith("http")) {
-//         url = "http://" + url;
-//     }
-
-//     try {
-//         const res = await fetch(API_CREATE, {
-//             method: "POST",
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify({ originalUrl: url })
-//         });
-
-//         // backend returns plain value like: 8
-//         const code = await res.text();
-
-//         const finalUrl = REDIRECT_BASE + code;
-
-//         document.getElementById("shortUrl").textContent = finalUrl;
-//         document.getElementById("result").classList.add("show");
-
-//     } catch (e) {
-//         alert("Server error");
-//     }
-// }
-
-// function copyUrl() {
-//     const text = document.getElementById("shortUrl").textContent;
-
-//     navigator.clipboard.writeText(text).then(() => {
-//         const btn = document.querySelector(".copy-btn");
-//         btn.textContent = "Copied!";
-//         setTimeout(() => btn.textContent = "Copy to Clipboard", 1500);
-//     });
-// }
-
-// // ENTER key support
-// document.getElementById("urlInput").addEventListener("keydown", e => {
-//     if (e.key === "Enter") shortenUrl();
-// });
 </script>
 
 </script>
