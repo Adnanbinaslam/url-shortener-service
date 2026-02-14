@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URL Shortener</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a0a;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: #161616;
+    padding: 48px 40px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 1px solid #262626;
+}
+
+h1 {
+    color: #f5f5f5;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #a3a3a3;
+    font-size: 15px;
+    margin-bottom: 32px;
+}
+
+.input-wrapper {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #0a0a0a;
+    border: 1px solid #262626;
+    border-radius: 10px;
+    color: #f5f5f5;
+    font-size: 15px;
+    transition: border-color 0.2s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #404040;
+}
+
+input::placeholder {
+    color: #525252;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.result {
+    margin-top: 28px;
+    padding: 20px;
+    background: #0a0a0a;
+    border-radius: 12px;
+    border: 1px solid #262626;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.result.show {
+    opacity: 1;
+    max-height: 200px;
+}
+
+.result-label {
+    font-size: 13px;
+    color: #737373;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.short-url {
+    background: #161616;
+    padding: 14px 16px;
+    border-radius: 8px;
+    color: #a3a3a3;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    word-break: break-all;
+    border: 1px solid #262626;
+}
+
+.copy-btn {
+    padding: 12px;
+    background: #10b981;
+    font-size: 14px;
+}
+
+.copy-btn.copied {
+    background: #059669;
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 36px 24px;
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>URL Shortener</h1>
+    <div class="subtitle">Create short, memorable links</div>
+    
+    <div class="input-wrapper">
+        <input 
+            id="urlInput" 
+            type="text"
+            placeholder="Enter your long URL here..."
+            autocomplete="off"
+        >
+    </div>
+    
+    <button onclick="shortenUrl()">Shorten URL</button>
+    
+    <div id="result" class="result">
+        <div class="result-label">Your shortened URL</div>
+        <div id="shortUrl" class="short-url"></div>
+        <button class="copy-btn" onclick="copyUrl()">Copy to Clipboard</button>
+    </div>
+</div>
+
+<script>
+// Automatically use the correct URL based on environment
+const BASE_URL = window.location.origin;
+const API_CREATE = `${BASE_URL}/shorty/create`;
+const REDIRECT_BASE = `${BASE_URL}/shorty/r/`;
+
+async function shortenUrl() {
+    let url = document.getElementById("urlInput").value.trim();
+    
+    if (!url) {
+        showError("Please enter a URL");
+        return;
+    }
+    
+    if (!url.startsWith("http")) {
+        url = "http://" + url;
+    }
+    
+    try {
+        const res = await fetch(API_CREATE, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ originalUrl: url })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+            const code = data.shortUrl || data.short_url || data.shortened_url || data;
+            const finalUrl = REDIRECT_BASE + code;
+            
+            document.getElementById("shortUrl").textContent = finalUrl;
+            document.getElementById("result").classList.add("show");
+        } else {
+            showError("Failed to shorten URL. Please try again.");
+        }
+    } catch (err) {
+        showError("Unable to connect. Make sure the backend is running.");
+    }
+}
+
+async function copyUrl() {
+    const text = document.getElementById("shortUrl").textContent;
+    const btn = event.target;
+    
+    try {
+        await navigator.clipboard.writeText(text);
+        const originalText = btn.textContent;
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.classList.remove("copied");
+        }, 2000);
+    } catch (err) {
+        showError("Failed to copy to clipboard");
+    }
+}
+
+function showError(message) {
+    alert(message);
+}
+
+document.getElementById("urlInput").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        shortenUrl();
+    }
+});
+
+
+// const BASE_URL = window.location.origin;
+// const API_CREATE = BASE_URL + "/shorty/create";
+// const REDIRECT_BASE = BASE_URL + "/shorty/r/";
+
+// async function shortenUrl() {
+//     let url = document.getElementById("urlInput").value.trim();
+
+//     if (!url) {
+//         alert("Enter URL");
+//         return;
+//     }
+
+//     if (!url.startsWith("http")) {
+//         url = "http://" + url;
+//     }
+
+//     try {
+//         const res = await fetch(API_CREATE, {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({ originalUrl: url })
+//         });
+
+//         // backend returns plain value like: 8
+//         const code = await res.text();
+
+//         const finalUrl = REDIRECT_BASE + code;
+
+//         document.getElementById("shortUrl").textContent = finalUrl;
+//         document.getElementById("result").classList.add("show");
+
+//     } catch (e) {
+//         alert("Server error");
+//     }
+// }
+
+// function copyUrl() {
+//     const text = document.getElementById("shortUrl").textContent;
+
+//     navigator.clipboard.writeText(text).then(() => {
+//         const btn = document.querySelector(".copy-btn");
+//         btn.textContent = "Copied!";
+//         setTimeout(() => btn.textContent = "Copy to Clipboard", 1500);
+//     });
+// }
+
+// // ENTER key support
+// document.getElementById("urlInput").addEventListener("keydown", e => {
+//     if (e.key === "Enter") shortenUrl();
+// });
+</script>
+
+</script>
+</body>
+</html>
