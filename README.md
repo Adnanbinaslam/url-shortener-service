@@ -36,8 +36,8 @@ The application features a minimalist dark theme with:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Adnanbinaslam/url-shortener.git
-   cd url-shortener
+   git clone https://github.com/Adnanbinaslam/url-shortener-service.git
+   cd url-shortener-service
    ```
 
 2. **Build the project**
@@ -218,7 +218,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Adnan Bin Aslam**
 
 - GitHub: [@Adnanbinaslam](https://github.com/Adnanbinaslam)
-- Project Link: [https://github.com/Adnanbinaslam/url-shortener](https://github.com/Adnanbinaslam/url-shortener)
+- Project Link: [https://github.com/Adnanbinaslam/url-shortener](https://github.com/Adnanbinaslam/url-shortener-service)
 
 ## 🙏 Acknowledgments
 
